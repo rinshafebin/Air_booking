@@ -1,10 +1,20 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from users.serializers import RegisterSerializer, LoginSerializer
-from django.contrib.auth import authenticate
+from users.models import User
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.permissions import IsAdminUser
+from users.serializers import (
+    AdminUserSerializer,
+    RegisterSerializer, 
+    LoginSerializer,
+    AdminUserActionSerializer,
+    AdminUserDetailSerializer
+    )
 
+
+
+# ------------------ Login and register ------------------
 
 class RegisterView(APIView):
     def post(self, request):
@@ -31,3 +41,53 @@ class LoginView(APIView):
             }, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+# ------------------  Admin apis ------------------
+
+class PendingUserListView(APIView):
+    permission_classes =[IsAdminUser]
+    def get(self,request):
+        pending_users = User.objects.filter(approval_status='pending')
+        serializer = AdminUserSerializer(pending_users,many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+class ApproveRejectUserView(APIView):
+    permission_classes = [IsAdminUser]
+
+    def post(self, request, user_id):
+        serializer = AdminUserActionSerializer(data=request.data)
+        if serializer.is_valid():
+            action = serializer.validated_data['action']
+
+            try:
+                user = User.objects.get(id=user_id, approval_status='pending')
+            except User.DoesNotExist:
+                return Response({"error": "User not found or already processed."},
+                                status=status.HTTP_404_NOT_FOUND)
+
+            user.approval_status = 'approved' if action == 'approve' else 'rejected'
+            user.save()
+
+            return Response({"message": f"User {action}d successfully."},
+                            status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class AdminUserDetailView(APIView):
+    permission_classes = [IsAdminUser]
+
+    def get(self, request, user_id):
+        try:
+            user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = AdminUserDetailSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)  
+
+
+            
+        

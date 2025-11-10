@@ -3,7 +3,7 @@ from django.db import models
 from django.utils import timezone
 
 class User(AbstractUser):
-    username = None 
+    username = models.CharField(max_length=150)
     email = models.EmailField(unique=True)
 
     APPROVAL_STATUS_CHOICES = [
@@ -22,14 +22,13 @@ class User(AbstractUser):
     updated_at = models.DateTimeField(auto_now=True)
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = []
+    REQUIRED_FIELDS = ['username']
 
     def __str__(self):
         return self.email
 
     @property
     def is_approved(self):
-        """Return True if user is approved."""
         return self.approval_status == 'approved'
 
     class Meta:

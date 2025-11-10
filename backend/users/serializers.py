@@ -49,3 +49,19 @@ class LoginSerializer(serializers.Serializer):
 
         data['user'] = user
         return data
+
+
+class AdminUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields =['id','email','username','created_at']
+        
+
+class AdminUserActionSerializer(serializers.Serializer):
+    action = serializers.ChoiceField(choices=['approve','reject'])
+
+
+class AdminUserDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id','username','email','approval_status','is_active','created_at','updated_at']
