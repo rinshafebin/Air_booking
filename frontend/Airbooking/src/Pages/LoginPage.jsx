@@ -1,17 +1,31 @@
 import React, { useState } from 'react';
 import { Plane } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import axiosInstance from '../api/axiosInstance';
+import { useAuth } from '../context/authContext.jsx'; 
 
 export default function LoginPage() {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: ''
-  });
+  const navigate = useNavigate();
+  const { dispatch } = useAuth();
+
+  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Login:', formData);
+    setLoading(true);
+    try {
+      const res = await axiosInstance.post('api/auth/login', formData);
+      // Backend should return { token, user }
+      dispatch({ type: 'LOGIN', payload: { user: res.data.user, token: res.data.token } });
+      navigate('/dashboard'); // Redirect after login
+    } catch (err) {
+      alert(err.response?.data?.message || 'Login failed');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -37,7 +51,6 @@ export default function LoginPage() {
               value={formData.email}
               onChange={handleChange}
               className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition"
-              placeholder="you@example.com"
               required
             />
           </div>
@@ -51,7 +64,6 @@ export default function LoginPage() {
               value={formData.password}
               onChange={handleChange}
               className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition"
-              placeholder="••••••••"
               required
             />
           </div>
@@ -61,18 +73,25 @@ export default function LoginPage() {
               <input type="checkbox" className="w-4 h-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500" />
               <span className="ml-2 text-gray-600">Remember me</span>
             </label>
-            <button type="button" className="text-emerald-600 hover:text-emerald-700 font-medium">Forgot password?</button>
+            <button
+              type="button"
+              className="text-emerald-600 hover:text-emerald-700 font-medium"
+              onClick={() => navigate('/reset-password')}
+            >
+              Forgot password?
+            </button>
           </div>
 
           <button
             type="submit"
+            disabled={loading}
             className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-3 rounded-xl transition duration-200 shadow-md hover:shadow-lg"
           >
-            Sign In
+            {loading ? 'Signing In...' : 'Sign In'}
           </button>
         </form>
 
-        {/* Divider */}
+        {/* Divider & Social Login */}
         <div className="relative my-6">
           <div className="absolute inset-0 flex items-center">
             <div className="w-full border-t border-gray-200"></div>
@@ -82,11 +101,11 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* Social Login */}
         <div className="flex flex-col gap-3">
           <button
             className="flex items-center justify-center w-full px-4 py-3 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition shadow-sm hover:shadow-md"
           >
+            {/* Google Icon */}
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
               <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
@@ -97,11 +116,15 @@ export default function LoginPage() {
           </button>
         </div>
 
-
         {/* Toggle */}
         <p className="text-center text-gray-600 mt-6">
           Don't have an account?
-          <a href="/register" className="text-emerald-600 hover:text-emerald-700 font-semibold ml-1">Sign up</a>
+          <span
+            className="text-emerald-600 hover:text-emerald-700 font-semibold ml-1 cursor-pointer"
+            onClick={() => navigate('/register')}
+          >
+            Sign up
+          </span>
         </p>
       </div>
     </div>

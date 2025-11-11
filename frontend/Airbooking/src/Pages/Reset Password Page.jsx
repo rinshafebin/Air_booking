@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { Plane } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export default function ResetPasswordPage() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
 
   const handleSubmit = (e) => {
@@ -25,7 +27,6 @@ export default function ResetPasswordPage() {
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
             <input
               type="email"
               id="email"
@@ -33,14 +34,15 @@ export default function ResetPasswordPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition"
-              placeholder="you@example.com"
               required
+              placeholder='Enter your email '
             />
           </div>
 
           <button
             type="submit"
             className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-3 rounded-xl transition duration-200 shadow-md hover:shadow-lg"
+            onClick={()=>navigate("/change-password")}
           >
             Send Reset Link
           </button>

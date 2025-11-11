@@ -14,8 +14,6 @@ from users.serializers import (
 
 
 
-# ------------------ Login and register ------------------
-
 class RegisterView(APIView):
     def post(self, request):
         serializer = RegisterSerializer(data=request.data)
@@ -44,7 +42,6 @@ class LoginView(APIView):
 
 
 
-# ------------------  Admin apis ------------------
 
 class PendingUserListView(APIView):
     permission_classes =[IsAdminUser]

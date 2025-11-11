@@ -1,22 +1,39 @@
 import React, { useState } from 'react';
 import { Plane } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
-export default function ChangePasswordPage() {
+export default function ChangePasswordWithOTP() {
+  const navigate =useNavigate()
+  const [step, setStep] = useState(1);
+  const [otp, setOtp] = useState('');
   const [formData, setFormData] = useState({
-    currentPassword: '',
     newPassword: '',
     confirmPassword: ''
   });
 
-  const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleOtpSubmit = (e) => {
+    e.preventDefault();
 
-  const handleSubmit = (e) => {
+    // Verify OTP with backend
+    console.log('Verifying OTP:', otp);
+    const otpIsValid = true; 
+    if (otpIsValid) {
+      setStep(2); 
+    } else {
+      alert('Invalid OTP. Please try again.');
+    }
+  };
+
+  const handleChangePasswordSubmit = (e) => {
     e.preventDefault();
     if (formData.newPassword !== formData.confirmPassword) {
-      alert("New passwords do not match!");
+      alert("Passwords do not match!");
       return;
     }
-    console.log('Change Password:', formData);
+
+    console.log('Changing password:', formData);
+    alert('Password updated successfully!');
+    navigate("/login")
   };
 
   return (
@@ -28,60 +45,73 @@ export default function ChangePasswordPage() {
             <Plane className="w-8 h-8 text-emerald-600" />
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Change Password</h1>
-          <p className="text-gray-500">Update your account password securely</p>
+          <p className="text-gray-500">
+            {step === 1
+              ? 'Enter the OTP sent to your email'
+              : 'Enter your new password'}
+          </p>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div>
-            <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700 mb-2">Current Password</label>
-            <input
-              type="password"
-              id="currentPassword"
-              name="currentPassword"
-              value={formData.currentPassword}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition"
-              placeholder="••••••••"
-              required
-            />
-          </div>
+        {/* Step 1: OTP */}
+        {step === 1 && (
+          <form onSubmit={handleOtpSubmit} className="space-y-5">
+            <div>
+              <input
+                type="text"
+                id="otp"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition"
+                placeholder="Enter OTP"
+                required
+              />
+            </div>
+            <button
+              type="submit"
+              className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-3 rounded-xl transition duration-200 shadow-md hover:shadow-lg"
+            >
+              Verify OTP
+            </button>
+          </form>
+        )}
 
-          <div>
-            <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 mb-2">New Password</label>
-            <input
-              type="password"
-              id="newPassword"
-              name="newPassword"
-              value={formData.newPassword}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition"
-              placeholder="••••••••"
-              required
-            />
-          </div>
+        {/* Step 2: New Password */}
+        {step === 2 && (
+          <form onSubmit={handleChangePasswordSubmit} className="space-y-5">
+            <div>
+              <input
+                type="password"
+                id="newPassword"
+                name="newPassword"
+                value={formData.newPassword}
+                onChange={(e) => setFormData({ ...formData, newPassword: e.target.value })}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition"
+                placeholder="enter new password"
+                required
+              />
+            </div>
 
-          <div>
-            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">Confirm New Password</label>
-            <input
-              type="password"
-              id="confirmPassword"
-              name="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition"
-              placeholder="••••••••"
-              required
-            />
-          </div>
+            <div>
+              <input
+                type="password"
+                id="confirmPassword"
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition"
+                placeholder="confirm your password"
+                required
+              />
+            </div>
 
-          <button
-            type="submit"
-            className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-3 rounded-xl transition duration-200 shadow-md hover:shadow-lg"
-          >
-            Update Password
-          </button>
-        </form>
+            <button
+              type="submit"
+              className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-3 rounded-xl transition duration-200 shadow-md hover:shadow-lg"
+            >
+              Update Password
+            </button>
+          </form>
+        )}
       </div>
     </div>
   );
