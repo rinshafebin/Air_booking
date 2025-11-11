@@ -17,9 +17,10 @@ class User(AbstractUser):
         default='pending'
     )
 
-    # Timestamps
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    email_sent = models.BooleanField(default=False) 
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']

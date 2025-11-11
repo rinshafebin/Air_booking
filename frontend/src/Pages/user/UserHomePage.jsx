@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plane, ClipboardList, Briefcase, Activity, Calendar, MapPin } from "lucide-react";
-import Navbar from '../Components/Navbar'
-import Footer from '../Components/Footer'
+import Navbar from '../../Components/Navbar'
+import Footer from '../../Components/Footer'
 
 export default function UserHomePage() {
   const navigate = useNavigate();

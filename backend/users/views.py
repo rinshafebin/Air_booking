@@ -2,6 +2,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from users.models import User
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAdminUser
 from users.serializers import (
@@ -27,21 +29,24 @@ class RegisterView(APIView):
 
 
 class LoginView(APIView):
-
     def post(self, request):
-        serializer = LoginSerializer(data=request.data)
+        serializer = LoginSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             user = serializer.validated_data['user']
             refresh = RefreshToken.for_user(user)
             return Response({
-                "refresh": str(refresh),
+                "user": {
+                    "id": user.id,
+                    "username": user.username,
+                    "email": user.email,
+                    "is_admin": user.is_superuser, 
+                },
                 "access": str(refresh.access_token),
-            }, status=status.HTTP_200_OK)
+                "refresh": str(refresh),
+            }, status=200)
+        return Response(serializer.errors, status=400)
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-
+    
 
 class PendingUserListView(APIView):
     permission_classes =[IsAdminUser]
@@ -50,7 +55,7 @@ class PendingUserListView(APIView):
         serializer = AdminUserSerializer(pending_users,many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
-
+@method_decorator(csrf_exempt, name='dispatch')
 class ApproveRejectUserView(APIView):
     permission_classes = [IsAdminUser]
 

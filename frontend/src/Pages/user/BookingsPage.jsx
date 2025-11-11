@@ -1,20 +1,22 @@
 import React from "react";
-import Navbar from '../Components/Navbar'
+import Navbar from '../../Components/Navbar'
 
-export default function MyTripsPage() {
+export default function BookingsPage() {
   return (
     <>
       <Navbar />
       <div className="min-h-screen bg-orange-50 py-12 px-6">
         <div className="max-w-5xl mx-auto bg-white rounded-2xl shadow-md p-6">
-          <h1 className="text-2xl font-bold text-gray-800 mb-4">My Trips</h1>
+          <h1 className="text-2xl font-bold text-gray-800 mb-4">
+            Your Bookings
+          </h1>
           <p className="text-gray-600">
-            View all your past and upcoming trips in one place.
+            Here you can view and manage all your flight bookings.
           </p>
 
-          {/* Trips Placeholder */}
+          {/* Placeholder for bookings list */}
           <div className="mt-8 text-gray-500 italic">
-            You have no trips yet. Book a flight to see it here.
+            No bookings yet. Start by searching for flights.
           </div>
         </div>
       </div>

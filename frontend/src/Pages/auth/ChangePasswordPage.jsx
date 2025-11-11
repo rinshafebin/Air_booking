@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Plane } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-export default function ChangePasswordWithOTP() {
+export default function ChangePasswordPage() {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [otp, setOtp] = useState('');

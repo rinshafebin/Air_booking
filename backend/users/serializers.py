@@ -30,6 +30,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         return user
 
 
+
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
@@ -38,18 +39,18 @@ class LoginSerializer(serializers.Serializer):
         email = data.get('email')
         password = data.get('password')
 
-        if email and password:
-            user = authenticate(email=email, password=password)
-            if not user:
-                raise serializers.ValidationError({"detail": "Invalid credentials."})
-            if not user.is_approved:
-                raise serializers.ValidationError({"detail": "User not approved by admin yet."})
-        else:
+        if not email or not password:
             raise serializers.ValidationError({"detail": "Email and password are required."})
+        user = authenticate(request=self.context.get('request'), email=email, password=password)
+
+        if not user:
+            raise serializers.ValidationError({"detail": "Invalid credentials."})
+
+        if not user.is_approved:
+            raise serializers.ValidationError({"detail": "User not approved by admin yet."})
 
         data['user'] = user
         return data
-
 
 class AdminUserSerializer(serializers.ModelSerializer):
     class Meta:
